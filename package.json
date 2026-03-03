@@ -27,6 +27,9 @@
     "onCommand:informixQuery.clearAllSavedPasswords"
   ],
   "main": "./dist/extension.js",
+  "extensionKind": [
+    "workspace"
+  ],
   "contributes": {
     "commands": [
       {

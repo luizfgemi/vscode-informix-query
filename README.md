@@ -4,15 +4,48 @@ VSCode extension to run Informix SQL queries through a Python `ibm-db` bridge.
 
 ## Badges
 
-Replace `<PUBLISHER>` once before first publish:
-
 [![CI](https://github.com/luizfgemi/vscode-informix-query/actions/workflows/ci.yml/badge.svg)](https://github.com/luizfgemi/vscode-informix-query/actions/workflows/ci.yml)
 [![Release](https://github.com/luizfgemi/vscode-informix-query/actions/workflows/release.yml/badge.svg)](https://github.com/luizfgemi/vscode-informix-query/actions/workflows/release.yml)
-[![VS Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
-[![VS Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
-[![VS Marketplace Rating](https://img.shields.io/visual-studio-marketplace/r/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
 
-Current `package.json` uses `publisher: "local"`, so store badges only work after setting a real publisher and publishing at least once.
+## Installation local (.vsix)
+
+### Option 1: CI artifact (every push/PR)
+
+1. Open the latest CI run: https://github.com/luizfgemi/vscode-informix-query/actions/workflows/ci.yml
+2. Download artifact `vscode-informix-query-vsix`.
+3. Install:
+
+```bash
+code --install-extension vscode-informix-query-<version>.vsix
+```
+
+### Option 2: GitHub Release asset (tag `vX.Y.Z`)
+
+1. Open releases: https://github.com/luizfgemi/vscode-informix-query/releases
+2. Download the `.vsix` attached to the tag.
+3. Install:
+
+```bash
+code --install-extension vscode-informix-query-<version>.vsix
+```
+
+## Install in WSL
+
+1. Open the project in a Remote-WSL window (`Remote-WSL: New Window`).
+2. Install the `.vsix` in the WSL context:
+3. UI: Extensions panel -> extension menu -> `Install in WSL`.
+4. CLI inside WSL terminal:
+
+```bash
+code --install-extension ./vscode-informix-query-<version>.vsix
+```
+
+Requirements inside WSL:
+
+- `python3`
+- `python3-venv`
+
+The extension runs as `workspace` extension kind, so runtime, Python venv, and bridge execution happen in WSL.
 
 ## Core capabilities
 
