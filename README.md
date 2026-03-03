@@ -4,10 +4,10 @@ VSCode extension to run Informix SQL queries through a Python `ibm-db` bridge.
 
 ## Badges
 
-Replace `<OWNER>`, `<REPO>`, and `<PUBLISHER>` once before first publish:
+Replace `<PUBLISHER>` once before first publish:
 
-[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
-[![Release](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml)
+[![CI](https://github.com/luizfgemi/vscode-informix-query/actions/workflows/ci.yml/badge.svg)](https://github.com/luizfgemi/vscode-informix-query/actions/workflows/ci.yml)
+[![Release](https://github.com/luizfgemi/vscode-informix-query/actions/workflows/release.yml/badge.svg)](https://github.com/luizfgemi/vscode-informix-query/actions/workflows/release.yml)
 [![VS Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
 [![VS Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
 [![VS Marketplace Rating](https://img.shields.io/visual-studio-marketplace/r/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
