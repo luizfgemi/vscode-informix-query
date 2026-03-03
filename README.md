@@ -233,7 +233,7 @@ Typical paths:
 ## Development
 
 ```bash
-cd /home/fernando/mediastack/vscode-informix-query
+cd /home/fernando/repos/vscode-informix-query
 docker compose -f docker-compose.dev.yml build
 docker compose -f docker-compose.dev.yml run --rm dev npm install
 docker compose -f docker-compose.dev.yml run --rm dev npm run compile
@@ -241,3 +241,34 @@ docker compose -f docker-compose.dev.yml run --rm dev npx @vscode/vsce package
 ```
 
 Launch extension development host with `F5` in VSCode.
+
+## Versioning and release flow
+
+You do not need to manually edit `package.json` version every time.
+
+Standard flow:
+
+1. Choose version bump:
+2. `patch` for fixes, `minor` for new backward-compatible features, `major` for breaking changes.
+3. Run one command to bump version, create commit, and create tag:
+
+```bash
+npm run release:patch
+# or: npm run release:minor
+# or: npm run release:major
+```
+
+4. Push commit and tag:
+
+```bash
+npm run release:push
+```
+
+If you prefer containerized execution:
+
+```bash
+docker compose -f docker-compose.dev.yml run --rm --user "$(id -u):$(id -g)" dev npm run release:patch
+npm run release:push
+```
+
+After pushing the tag (`vX.Y.Z`), GitHub Actions `Release` generates and attaches the `.vsix` asset automatically.

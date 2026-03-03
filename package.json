@@ -271,7 +271,12 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "package:vsix": "npx @vscode/vsce package --no-dependencies --allow-missing-repository",
+    "release:patch": "npm version patch -m \"chore: release v%s\"",
+    "release:minor": "npm version minor -m \"chore: release v%s\"",
+    "release:major": "npm version major -m \"chore: release v%s\"",
+    "release:push": "git push origin main --follow-tags"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
