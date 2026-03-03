@@ -272,3 +272,21 @@ npm run release:push
 ```
 
 After pushing the tag (`vX.Y.Z`), GitHub Actions `Release` generates and attaches the `.vsix` asset automatically.
+
+### Development branch versioning (`develop`)
+
+For `develop`, prefer SemVer pre-release format:
+
+- `0.0.3-dev.1`
+- `0.0.3-dev.2`
+- `0.0.3-beta.1`
+
+Avoid non-standard formats like `dev-0.0.3`.
+
+For quick internal testing on `develop`, you can keep the same version and reinstall with `--force`:
+
+```bash
+code --install-extension vscode-informix-query-<version>.vsix --force
+```
+
+Use version bump + tag only when you want a new GitHub Release asset.
