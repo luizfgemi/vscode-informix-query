@@ -9,7 +9,7 @@ VSCode extension to run Informix SQL queries through a Python `ibm-db` bridge.
 
 ## Installation local (.vsix)
 
-### Option 1: CI artifact (every push/PR)
+### Option 1: CI artifact (push to `main`/`develop` and every PR)
 
 1. Open the latest CI run: https://github.com/luizfgemi/vscode-informix-query/actions/workflows/ci.yml
 2. Download artifact `vscode-informix-query-vsix`.
