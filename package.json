@@ -2,7 +2,7 @@
   "name": "vscode-informix-query",
   "displayName": "Informix Query",
   "description": "Run Informix SQL queries directly from VSCode using a Python ibm-db bridge.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "local",
   "license": "UNLICENSED",
   "engines": {
