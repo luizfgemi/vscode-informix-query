@@ -1,0 +1,278 @@
+{
+  "name": "vscode-informix-query",
+  "displayName": "Informix Query",
+  "description": "Run Informix SQL queries directly from VSCode using a Python ibm-db bridge.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:informixQuery.runQuery",
+    "onCommand:informixQuery.runCurrentStatement",
+    "onCommand:informixQuery.selectProfile",
+    "onCommand:informixQuery.addProfile",
+    "onCommand:informixQuery.editProfile",
+    "onCommand:informixQuery.removeProfile",
+    "onCommand:informixQuery.openProfilesConfig",
+    "onCommand:informixQuery.testConnection",
+    "onCommand:informixQuery.saveQueryAsEnvironment",
+    "onCommand:informixQuery.insertEnvCommentStatement",
+    "onCommand:informixQuery.insertEnvCommentTop",
+    "onCommand:informixQuery.clearSavedPassword",
+    "onCommand:informixQuery.clearAllSavedPasswords"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "informixQuery.runQuery",
+        "title": "Informix: Run Query"
+      },
+      {
+        "command": "informixQuery.runCurrentStatement",
+        "title": "Informix: Run Current Statement"
+      },
+      {
+        "command": "informixQuery.selectProfile",
+        "title": "Informix: Select Profile"
+      },
+      {
+        "command": "informixQuery.addProfile",
+        "title": "Informix: Add Profile"
+      },
+      {
+        "command": "informixQuery.editProfile",
+        "title": "Informix: Edit Profile"
+      },
+      {
+        "command": "informixQuery.removeProfile",
+        "title": "Informix: Remove Profile"
+      },
+      {
+        "command": "informixQuery.openProfilesConfig",
+        "title": "Informix: Open Profiles Config"
+      },
+      {
+        "command": "informixQuery.testConnection",
+        "title": "Informix: Test Connection"
+      },
+      {
+        "command": "informixQuery.saveQueryAsEnvironment",
+        "title": "Informix: Save Query As Environment"
+      },
+      {
+        "command": "informixQuery.insertEnvCommentStatement",
+        "title": "Informix: Insert Environment Comment (Statement)"
+      },
+      {
+        "command": "informixQuery.insertEnvCommentTop",
+        "title": "Informix: Insert Environment Comment (Top)"
+      },
+      {
+        "command": "informixQuery.clearSavedPassword",
+        "title": "Informix: Clear Saved Password"
+      },
+      {
+        "command": "informixQuery.clearAllSavedPasswords",
+        "title": "Informix: Clear All Saved Passwords"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "informixQuery.runCurrentStatement",
+          "when": "editorTextFocus",
+          "group": "navigation@1"
+        },
+        {
+          "command": "informixQuery.runQuery",
+          "when": "editorTextFocus",
+          "group": "navigation@2"
+        },
+        {
+          "command": "informixQuery.selectProfile",
+          "when": "editorTextFocus",
+          "group": "navigation@3"
+        },
+        {
+          "command": "informixQuery.testConnection",
+          "when": "editorTextFocus",
+          "group": "navigation@4"
+        },
+        {
+          "command": "informixQuery.insertEnvCommentStatement",
+          "when": "editorTextFocus",
+          "group": "navigation@5"
+        },
+        {
+          "command": "informixQuery.insertEnvCommentTop",
+          "when": "editorTextFocus",
+          "group": "navigation@6"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "informixQuery.runCurrentStatement",
+          "when": "editorTextFocus",
+          "group": "navigation"
+        },
+        {
+          "command": "informixQuery.selectProfile",
+          "when": "editorTextFocus",
+          "group": "navigation@2"
+        },
+        {
+          "command": "informixQuery.testConnection",
+          "when": "editorTextFocus",
+          "group": "navigation@3"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "informixQuery.runCurrentStatement",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && !editorReadonly"
+      },
+      {
+        "command": "informixQuery.runQuery",
+        "key": "ctrl+shift+enter",
+        "mac": "cmd+shift+enter",
+        "when": "editorTextFocus && !editorReadonly"
+      }
+    ],
+    "configuration": {
+      "title": "Informix Query",
+      "properties": {
+        "informixQuery.host": {
+          "type": "string",
+          "default": "",
+          "description": "Informix host name or IP address."
+        },
+        "informixQuery.port": {
+          "type": "number",
+          "default": 9088,
+          "description": "Informix port."
+        },
+        "informixQuery.database": {
+          "type": "string",
+          "default": "",
+          "description": "Informix database name."
+        },
+        "informixQuery.user": {
+          "type": "string",
+          "default": "",
+          "description": "Informix username."
+        },
+        "informixQuery.password": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Informix password. If empty, extension prompts at runtime and lets you store securely in VSCode SecretStorage or keep only for the session.",
+          "password": true
+        },
+        "informixQuery.server": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Informix server name used in connection string."
+        },
+        "informixQuery.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "Python executable used to run the Informix bridge script."
+        },
+        "informixQuery.queryTimeoutMs": {
+          "type": "number",
+          "default": 30000,
+          "description": "Timeout in milliseconds for query execution."
+        },
+        "informixQuery.maxRows": {
+          "type": "number",
+          "default": 1000,
+          "minimum": 1,
+          "description": "Maximum number of rows fetched for SELECT queries."
+        },
+        "informixQuery.activeProfile": {
+          "type": "string",
+          "default": "",
+          "description": "Name of the active profile from informixQuery.profiles."
+        },
+        "informixQuery.profiles": {
+          "type": "array",
+          "default": [],
+          "description": "List of Informix connection profiles.",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "environment",
+              "host",
+              "database",
+              "user"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Unique profile name."
+              },
+              "environment": {
+                "type": "string",
+                "description": "Logical environment key used by comments/filename resolution (example: dev, stage, prod)."
+              },
+              "host": {
+                "type": "string",
+                "description": "Informix host."
+              },
+              "port": {
+                "type": "number",
+                "default": 9088,
+                "description": "Informix port."
+              },
+              "database": {
+                "type": "string",
+                "description": "Informix database."
+              },
+              "user": {
+                "type": "string",
+                "description": "Informix username."
+              },
+              "password": {
+                "type": "string",
+                "description": "Optional Informix password. If omitted, extension prompts at runtime and lets you store securely in VSCode SecretStorage or keep only for the session."
+              },
+              "server": {
+                "type": "string",
+                "description": "Optional Informix server name."
+              },
+              "readOnly": {
+                "type": "boolean",
+                "default": false,
+                "description": "When true, blocks write/DDL statements for this profile."
+              },
+              "confirmWrites": {
+                "type": "boolean",
+                "default": false,
+                "description": "When true, requires typed confirmation for write/DDL statements."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.5.4"
+  }
+}

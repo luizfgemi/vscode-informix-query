@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build dev container
+        run: docker compose -f docker-compose.dev.yml build
+
+      - name: Install dependencies (container)
+        run: docker compose -f docker-compose.dev.yml run --rm dev npm ci
+
+      - name: Compile extension (container)
+        run: docker compose -f docker-compose.dev.yml run --rm dev npm run compile
+
+      - name: Package VSIX (container)
+        run: |
+          rm -f ./*.vsix
+          docker compose -f docker-compose.dev.yml run --rm dev npx @vscode/vsce package --no-dependencies --allow-missing-repository
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-informix-query-vsix
+          path: "*.vsix"
+          if-no-files-found: error

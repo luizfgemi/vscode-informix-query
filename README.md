@@ -1,0 +1,210 @@
+# vscode-informix-query
+
+VSCode extension to run Informix SQL queries through a Python `ibm-db` bridge.
+
+## Badges
+
+Replace `<OWNER>`, `<REPO>`, and `<PUBLISHER>` once before first publish:
+
+[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
+[![Release](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml)
+[![VS Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
+[![VS Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
+[![VS Marketplace Rating](https://img.shields.io/visual-studio-marketplace/r/<PUBLISHER>.vscode-informix-query)](https://marketplace.visualstudio.com/items?itemName=<PUBLISHER>.vscode-informix-query)
+
+Current `package.json` uses `publisher: "local"`, so store badges only work after setting a real publisher and publishing at least once.
+
+## Core capabilities
+
+- Execute selected SQL, current statement, or full document
+- Resolve target environment automatically using SQL comment and file name conventions
+- Manage multiple profiles (`dev`, `stage`, `prod`, etc.)
+- Enforce per-environment safety policies (`readOnly`, `confirmWrites`)
+- Prompt for missing password and optionally store securely in VSCode SecretStorage
+- Test connection using the same environment resolution logic used for query execution
+
+## Environment resolution precedence
+
+When running a query (or test connection), the extension resolves the target in this order:
+
+1. Statement comment: `-- env: <name>` immediately above the statement
+2. File name: `<anything>.<env>.sql`
+3. Active profile: `informixQuery.activeProfile`
+4. Legacy single-connection settings (`host/user/database/...`)
+
+Important behavior:
+
+- If a statement/file explicitly references an environment that does not exist, execution is blocked (no silent fallback).
+- Environment matching is case-insensitive.
+
+## SQL comment convention
+
+Use this format:
+
+```sql
+-- env: prod
+UPDATE orders SET status = 'closed' WHERE id = 42;
+```
+
+Supported key:
+
+- `env`
+
+## File naming convention
+
+Use:
+
+- `query.dev.sql`
+- `orders.prod.sql`
+- `cleanup.stage.sql`
+
+The last segment before `.sql` is treated as the environment key.
+
+## Profile configuration
+
+Configure profiles in `settings.json`:
+
+```json
+{
+  "informixQuery.profiles": [
+    {
+      "name": "local-dev",
+      "environment": "dev",
+      "host": "ifx-dev.local",
+      "port": 9088,
+      "database": "app_dev",
+      "user": "app_user",
+      "readOnly": false,
+      "confirmWrites": false
+    },
+    {
+      "name": "prod-main",
+      "environment": "prod",
+      "host": "ifx-prod.local",
+      "port": 9088,
+      "database": "app_prod",
+      "user": "app_user",
+      "readOnly": false,
+      "confirmWrites": true
+    }
+  ],
+  "informixQuery.activeProfile": "local-dev"
+}
+```
+
+Profile fields:
+
+- `name` (required): unique profile name
+- `environment` (required): unique environment key used by comment/file resolution
+- `host`, `port`, `database`, `user` (required except `port` default `9088`)
+- `password` (optional): if omitted, runtime prompt is used
+- `server` (optional)
+- `readOnly` (optional, default `false`): blocks write/DDL SQL
+- `confirmWrites` (optional): requires typed confirmation for risky SQL
+
+Uniqueness rules:
+
+- `name` must be unique (case-insensitive)
+- `environment` must be unique (case-insensitive)
+
+Default for production:
+
+- In the profile wizard, when `environment=prod`, `confirmWrites` defaults to `true`.
+
+## Password behavior (session vs SecretStorage)
+
+Password resolution order:
+
+1. `profiles[].password` (or legacy `informixQuery.password`)
+2. VSCode SecretStorage
+3. In-memory session cache
+4. Prompt
+
+When prompted, you can choose:
+
+- `Save securely in VSCode` (persists in SecretStorage)
+- `Use only this session` (memory only)
+
+Commands to clear secrets:
+
+- `Informix: Clear Saved Password`
+- `Informix: Clear All Saved Passwords`
+
+## Safety policies for write SQL
+
+Risky SQL keywords (case-insensitive):
+
+- `INSERT`, `UPDATE`, `DELETE`, `MERGE`, `TRUNCATE`, `CREATE`, `ALTER`, `DROP`, `RENAME`, `GRANT`, `REVOKE`
+- `SELECT ... INTO TEMP` is treated as risky
+
+Policy behavior:
+
+- `readOnly=true`: risky SQL is blocked
+- `confirmWrites=true`: modal warning + typed environment confirmation required
+
+## Commands
+
+- `Informix: Run Query`
+- `Informix: Run Current Statement`
+- `Informix: Test Connection`
+- `Informix: Select Profile`
+- `Informix: Add Profile`
+- `Informix: Edit Profile`
+- `Informix: Remove Profile`
+- `Informix: Open Profiles Config`
+- `Informix: Save Query As Environment`
+- `Informix: Insert Environment Comment (Statement)`
+- `Informix: Insert Environment Comment (Top)`
+- `Informix: Clear Saved Password`
+- `Informix: Clear All Saved Passwords`
+
+Keybindings:
+
+- `Ctrl+Enter` / `Cmd+Enter`: run current statement
+- `Ctrl+Shift+Enter` / `Cmd+Shift+Enter`: run selection/full document
+
+## Status bar
+
+The extension shows effective target as:
+
+- `IFX: <env> [stmt]`
+- `IFX: <env> [file]`
+- `IFX: <env> [active]`
+- `IFX: legacy [legacy]`
+
+Click the status item to select active profile.
+
+## Legacy mode (single connection)
+
+If no profiles are configured, extension falls back to legacy settings:
+
+- `informixQuery.host`
+- `informixQuery.port`
+- `informixQuery.database`
+- `informixQuery.user`
+- `informixQuery.password` (optional)
+- `informixQuery.server`
+
+## Runtime isolation (venv)
+
+On first use, extension creates a dedicated Python virtual environment in VSCode global storage and installs `ibm-db` there.
+
+Nothing is installed globally in system Python.
+
+Typical paths:
+
+- Linux: `~/.config/Code/User/globalStorage/local.vscode-informix-query/python-env/`
+- macOS: `~/Library/Application Support/Code/User/globalStorage/local.vscode-informix-query/python-env/`
+- Windows: `%APPDATA%\\Code\\User\\globalStorage\\local.vscode-informix-query\\python-env\\`
+
+## Development
+
+```bash
+cd /home/fernando/mediastack/vscode-informix-query
+docker compose -f docker-compose.dev.yml build
+docker compose -f docker-compose.dev.yml run --rm dev npm install
+docker compose -f docker-compose.dev.yml run --rm dev npm run compile
+docker compose -f docker-compose.dev.yml run --rm dev npx @vscode/vsce package
+```
+
+Launch extension development host with `F5` in VSCode.

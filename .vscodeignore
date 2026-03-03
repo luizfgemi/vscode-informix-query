@@ -1,0 +1,8 @@
+.vscode/**
+.vscode-test/**
+src/**
+**/*.ts
+tsconfig.json
+node_modules/**/.cache/**
+python/**/__pycache__/**
+**/*.pyc

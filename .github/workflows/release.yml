@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build dev container
+        run: docker compose -f docker-compose.dev.yml build
+
+      - name: Install dependencies (container)
+        run: docker compose -f docker-compose.dev.yml run --rm dev npm ci
+
+      - name: Validate tag matches package.json version
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          docker compose -f docker-compose.dev.yml run --rm -e TAG_NAME="$TAG_NAME" dev bash -lc '
+            TAG="${TAG_NAME#v}"
+            PKG="$(node -p "require(\"./package.json\").version")"
+            if [ "$TAG" != "$PKG" ]; then
+              echo "Tag version ($TAG) differs from package.json ($PKG)."
+              exit 1
+            fi
+          '
+
+      - name: Compile extension (container)
+        run: docker compose -f docker-compose.dev.yml run --rm dev npm run compile
+
+      - name: Package VSIX (container)
+        run: |
+          rm -f ./*.vsix
+          docker compose -f docker-compose.dev.yml run --rm dev npx @vscode/vsce package --no-dependencies --allow-missing-repository
+
+      - name: Publish to VS Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          [ -n "$VSCE_PAT" ] || { echo "Missing VSCE_PAT secret"; exit 1; }
+          docker compose -f docker-compose.dev.yml run --rm -e VSCE_PAT="$VSCE_PAT" dev bash -lc '
+            VSIX_FILE="$(ls -1 *.vsix | head -n1)"
+            [ -n "$VSIX_FILE" ] || { echo "No VSIX file found"; exit 1; }
+            npx @vscode/vsce publish --packagePath "$VSIX_FILE" --pat "$VSCE_PAT"
+          '
+
+      - name: Attach VSIX to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.vsix"
