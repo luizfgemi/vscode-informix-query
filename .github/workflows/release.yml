@@ -11,6 +11,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
     steps:
       - name: Checkout
@@ -44,15 +46,17 @@ jobs:
           docker compose -f docker-compose.dev.yml run --rm dev npx @vscode/vsce package --no-dependencies --allow-missing-repository
 
       - name: Publish to VS Marketplace
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        if: ${{ env.VSCE_PAT != '' }}
         run: |
-          [ -n "$VSCE_PAT" ] || { echo "Missing VSCE_PAT secret"; exit 1; }
           docker compose -f docker-compose.dev.yml run --rm -e VSCE_PAT="$VSCE_PAT" dev bash -lc '
             VSIX_FILE="$(ls -1 *.vsix | head -n1)"
             [ -n "$VSIX_FILE" ] || { echo "No VSIX file found"; exit 1; }
             npx @vscode/vsce publish --packagePath "$VSIX_FILE" --pat "$VSCE_PAT"
           '
+
+      - name: Skip VS Marketplace publish (no VSCE_PAT)
+        if: ${{ env.VSCE_PAT == '' }}
+        run: echo "VSCE_PAT not configured. Skipping Marketplace publish and continuing with GitHub Release asset."
 
       - name: Attach VSIX to GitHub Release
         uses: softprops/action-gh-release@v2
